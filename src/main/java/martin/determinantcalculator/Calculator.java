@@ -35,6 +35,8 @@ public class Calculator {
 
         logging.log("Threads used in current run: "+matrix.length);
 
+        es.shutdown();
+
         return result;
 	}
 }
