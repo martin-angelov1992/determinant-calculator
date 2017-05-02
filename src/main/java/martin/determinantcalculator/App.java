@@ -3,7 +3,6 @@ package martin.determinantcalculator;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.concurrent.ForkJoinPool;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -25,41 +24,47 @@ public class App
     }
 
     public void run(String[] args) throws ParseException {
+    	long start = System.currentTimeMillis();
+
     	Options options = new Options();
     	CommandLineParser parser = new DefaultParser();
     	CommandLine cmd = parser.parse( options, args);
 
-    	int tasks = 4;
+    	int threads = 4;
 
-    	float[][] matrix;
+    	boolean isQuiet = cmd.hasOption('q');
+    	Logging logging = new Logging(isQuiet);
+    	Calculator calculator = new Calculator(logging);
+
+    	if (cmd.hasOption('t')) {
+    		threads = Integer.valueOf(cmd.getOptionValue('t'));
+    	}
+
+    	double[][] matrix;
     	if (cmd.hasOption('i')) {
     		String file = cmd.getOptionValue('i');
     		matrix = matrixUtils.readMatrixFromFile(file);
     	} else if (cmd.hasOption('n')) {
     		int size = Integer.valueOf(cmd.getOptionValue('n'));
-    		matrix = matrixUtils.generateRandomMatrix(size);
+    		matrix = matrixUtils.generateRandomMatrix(size, threads);
     	} else {
     		throw new RuntimeException("You need to provide -n or -i parameter.");
     	}
 
-    	if (cmd.hasOption('t')) {
-    		tasks = Integer.valueOf(cmd.getOptionValue('t'));
-    	}
-
-    	ForkJoinPool fjPool = new ForkJoinPool(tasks);
-
-    	DeterminantTask task = new DeterminantTask(matrix);
-
-    	float result = fjPool.invoke(task);
+    	double result = calculator.calcDeterminant(matrix, threads);
 
     	if (cmd.hasOption('o')) {
     		String outputFile = cmd.getOptionValue('o');
 
     		writeResultToFile(result, outputFile);
     	}
+
+    	long end = System.currentTimeMillis();
+
+    	logging.logImportant("Total execution time for current run (millis): "+(end-start));
     }
 
-	private void writeResultToFile(float result, String fileStr) {
+	private void writeResultToFile(double result, String fileStr) {
 		File file = new File(fileStr);
 		try {
 			FileWriter  writer = new FileWriter(file, false);

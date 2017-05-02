@@ -1,45 +1,40 @@
 package martin.determinantcalculator;
 
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.RecursiveAction;
-import java.util.concurrent.RecursiveTask;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class Calculator {
-	public long calcDeterminant(Matrix matrix) {
-		ForkJoinPool pool = new ForkJoinPool();
+	private Logging logging;
 
-		pool.invoke(task)
+	public Calculator(Logging logging) {
+		this.logging = logging;
 	}
 
-	private class ForkCalcDeterminant extends RecursiveTask<Float> {
-		private float[][] matrix;
+	public double calcDeterminant(double[][] matrix, int tasks) {
+    	double result = 0;
 
-		public ForkCalcDeterminant(float[][] matrix) {
-			this.matrix = matrix;
-		}
+		ExecutorService es = Executors.newFixedThreadPool(tasks);
+    	Future<Double>[] futures = new Future[matrix.length];
 
-		@Override
-		protected Float compute() {
-			float result = 0;
-			float temporary[][];
-			
-			for (int i = 0; i < matrix[0].length; i++) {
-				temporary = new float[matrix.length - 1][matrix[0].length - 1];
+        for (int j1 = 0; j1 < matrix.length; j1++) {
+        	double[][] subMatrix = ParallelDeterminants.generateSubArray(matrix, j1);
+        	futures[j1] = es.submit(new ParallelDeterminants(subMatrix, "Thread"+(j1+1), logging));
+        }
 
-				for (int j = 1; j < matrix.length; j++) {
-					for (int k = 0; k < matrix[0].length; k++) {
-						if (k < i) {
-							temporary[j - 1][k] = matrix[j][k];
-						} else if (k > i) {
-							temporary[j - 1][k - 1] = matrix[j][k];
-						}
-					}
-				}
-
-				result += matrix[0][i] * Math.pow (-1, (double) i) * new ForkCalcDeterminant(temporary).join();
+        for (int j1 = 0; j1 < matrix.length; j1++) {
+        	try {
+				result += Math.pow(-1.0, 1.0 + j1 + 1.0) * matrix[0][j1] * futures[j1].get();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
 			}
+        }
 
-			return result;
-		}
+        logging.log("Threads used in current run: "+matrix.length);
+
+        return result;
 	}
 }
