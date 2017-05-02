@@ -1,0 +1,10 @@
+martin\determinantcalculator\MiltiThreadedRandomizer.class
+martin\determinantcalculator\SingleThreadedRandomizer.class
+martin\determinantcalculator\Logging.class
+martin\determinantcalculator\MatrixUtils.class
+martin\determinantcalculator\App.class
+martin\determinantcalculator\Randomizer.class
+martin\determinantcalculator\Calculator.class
+martin\determinantcalculator\GridRandomizer.class
+martin\determinantcalculator\MatrixUtils$FileLineParser.class
+martin\determinantcalculator\ParallelDeterminants.class
