@@ -4,6 +4,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class SingleThreadedRandomizer implements Randomizer {
 
+	// Creates a random matrix
 	public void randomize(double[][] matrix, int threads) {
 		int n = matrix.length;
 

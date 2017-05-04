@@ -1,5 +1,8 @@
 package martin.determinantcalculator;
 
+/*
+ * @Deprecated
+ */
 public class MiltiThreadedRandomizer implements Randomizer {
 
 	public void randomize(double[][] matrix, int threadsCount) {

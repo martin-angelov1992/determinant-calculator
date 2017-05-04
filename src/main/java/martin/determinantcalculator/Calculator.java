@@ -18,6 +18,7 @@ public class Calculator {
 		ExecutorService es = Executors.newFixedThreadPool(tasks);
     	Future<Double>[] futures = new Future[matrix.length];
 
+    	// Submit every submatrix to a different thread
         for (int j1 = 0; j1 < matrix.length; j1++) {
         	double[][] subMatrix = ParallelDeterminants.generateSubArray(matrix, j1);
         	futures[j1] = es.submit(new ParallelDeterminants(subMatrix, "Thread"+(j1+1), logging));
@@ -25,6 +26,7 @@ public class Calculator {
 
         for (int j1 = 0; j1 < matrix.length; j1++) {
         	try {
+        		// Time to sum up the results from the calculations
 				result += Math.pow(-1.0, 1.0 + j1 + 1.0) * matrix[0][j1] * futures[j1].get();
 			} catch (InterruptedException e) {
 				e.printStackTrace();

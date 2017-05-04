@@ -2,6 +2,11 @@ package martin.determinantcalculator;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+/*
+ * This class can be used to generate random elements in matrix, in different threads.
+ * No need to create threads for this purpose. Just generate random matrix in different threads.
+ * @Deprecated
+ */
 public class GridRandomizer extends Thread {
 
 	private double[][] matrix;

@@ -36,6 +36,7 @@ public class App
     	CommandLineParser parser = new DefaultParser();
     	CommandLine cmd = parser.parse( options, args);
 
+    	// Default number of threads will be 4
     	int threads = 4;
 
     	boolean isQuiet = cmd.hasOption('q');
@@ -55,13 +56,6 @@ public class App
     		matrix = matrixUtils.generateRandomMatrix(size, threads);
     	} else {
     		throw new RuntimeException("You need to provide -n or -i parameter.");
-    	}
-
-    	for (int i=0;i<matrix.length;++i) {
-    		for (int j=0;j<matrix.length;++j) {
-    			System.out.print(matrix[i][j]+" ");
-    		}
-    		System.out.println();
     	}
 
     	double result = calculator.calcDeterminant(matrix, threads);

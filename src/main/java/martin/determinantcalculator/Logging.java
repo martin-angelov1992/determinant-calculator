@@ -1,6 +1,7 @@
 package martin.determinantcalculator;
 
 public class Logging {
+	// quiet mode
 	private boolean quiet;
 
 	public Logging(boolean quiet) {
@@ -13,6 +14,7 @@ public class Logging {
 		}
 	}
 
+	// Log something regardles if quiet mode is on
 	public void logImportant(String str) {
 		System.out.println(str);
 	}

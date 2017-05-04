@@ -4,6 +4,7 @@ import java.util.concurrent.Callable;
 
 public class ParallelDeterminants implements Callable<Double> {
 	private double A[][];
+	// Used for logging purposes
 	private String threadName;
 	private Logging logging;
 

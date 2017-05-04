@@ -13,6 +13,7 @@ public class MatrixUtils {
 	public double[][] readMatrixFromFile(String file) {
 		try (Stream<String> stream = Files.lines(Paths.get(file))) {
 			List<String> list = stream.collect(Collectors.toList());
+			// first line of file is the size of the matrix
 			int n = Integer.valueOf(list.get(0).trim());
 			double[][] matrix = new double[n][n];
 			list.stream().skip(1).forEach(new FileLineParser(matrix));
