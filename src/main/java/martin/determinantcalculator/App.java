@@ -57,6 +57,13 @@ public class App
     		throw new RuntimeException("You need to provide -n or -i parameter.");
     	}
 
+    	for (int i=0;i<matrix.length;++i) {
+    		for (int j=0;j<matrix.length;++j) {
+    			System.out.print(matrix[i][j]+" ");
+    		}
+    		System.out.println();
+    	}
+
     	double result = calculator.calcDeterminant(matrix, threads);
 
     	if (cmd.hasOption('o')) {

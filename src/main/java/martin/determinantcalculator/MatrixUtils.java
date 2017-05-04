@@ -3,16 +3,19 @@ package martin.determinantcalculator;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class MatrixUtils {
 	private Randomizer randomizer = new SingleThreadedRandomizer();
 	public double[][] readMatrixFromFile(String file) {
 		try (Stream<String> stream = Files.lines(Paths.get(file))) {
-			int n = Integer.valueOf(stream.findFirst().get().trim());
+			List<String> list = stream.collect(Collectors.toList());
+			int n = Integer.valueOf(list.get(0).trim());
 			double[][] matrix = new double[n][n];
-			stream.forEach(new FileLineParser(matrix));
+			list.stream().skip(1).forEach(new FileLineParser(matrix));
 			return matrix;
 		} catch (IOException e) {
 			System.err.println("unable to open file");
