@@ -1,24 +1,25 @@
 package martin.determinantcalculator;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 public class ParallelDeterminants implements Callable<Double> {
 	private double A[][];
 	// Used for logging purposes
 	private String threadName;
 	private Logging logging;
-	private int splitDepth;
 	private int j1;
 	private int j2;
+	private double coeff;
+	private static int threadsCounter = 1;
 
-	public ParallelDeterminants(int j1, int j2, double[][] A, Logging logging) {
+	public ParallelDeterminants(int j1, int j2, double coeff, double[][] A, Logging logging) {
 		this.A = A;
 		this.logging = logging;
 		this.j1 = j1;
 		this.j2 = j2;
+		this.coeff = coeff;
+		this.threadName = "Thread"+threadsCounter;
+		++threadsCounter;
 	}
 
 	@Override
@@ -27,13 +28,13 @@ public class ParallelDeterminants implements Callable<Double> {
 
 		logging.log(threadName+" started.");
 
-		try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		int power = j1+j2;
+
+		if (j1 < j2) {
+			++power;
 		}
-		double result = computeDeterminant(A);
+
+		double result = Math.pow(-1.0, power)*coeff*computeDeterminant(A);
 
 		logging.log(threadName+" stopped.");
 
@@ -63,7 +64,7 @@ public class ParallelDeterminants implements Callable<Double> {
 		return m;
 	}
 
-	public static double computeDeterminant(double matrix[][], int splitDepth, ExecutorService es, Logging logging) {
+	public double computeDeterminant(double matrix[][]) {
 		double res;
 
 		// Trivial 1x1 matrix
@@ -77,44 +78,12 @@ public class ParallelDeterminants implements Callable<Double> {
 			res = 0;
 			for (int j1 = 0; j1 < matrix.length; j1++) {
 				double[][] m = generateSubArray(matrix, j1);
-				double subDeterminant;
-				if (m.length == splitDepth) {
-					subDeterminant = computeInParallel(m, splitDepth, es, logging);
-				} else {
-					subDeterminant = computeDeterminant(m, splitDepth, es, logging);
-				}
+				double subDeterminant = computeDeterminant(m);
 
-				res += Math.pow(-1.0, 1.0 + j1 + 1.0) * matrix[0][j1] * subDeterminant;
+				res += Math.pow(-1.0, j1) * matrix[0][j1] * subDeterminant;
 			}
 		}
+
 		return res;
-	}
-
-	public static double computeInParallel(double matrix[][], int splitDepth, ExecutorService es, Logging logging) {
-		double result = 0;
-
-    	Future<Double>[] futures = new Future[matrix.length];
-
-    	System.out.println("Paralelizing when size="+matrix.length);
-    	// Submit every submatrix to a different thread
-        for (int j1 = 0; j1 < matrix.length; j1++) {
-        	double[][] subMatrix = ParallelDeterminants.generateSubArray(matrix, j1);
-        	futures[j1] = es.submit(new ParallelDeterminants(es, splitDepth, subMatrix, "Thread"+(j1+1), logging));
-        }
-
-    	System.out.println("Done paralelizing");
-        
-        for (int j1 = 0; j1 < matrix.length; j1++) {
-        	try {
-        		// Time to sum up the results from the calculations
-				result += Math.pow(-1.0, 1.0 + j1 + 1.0) * matrix[0][j1] * futures[j1].get();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				e.printStackTrace();
-			}
-        }
-
-        return result;
 	}
 }

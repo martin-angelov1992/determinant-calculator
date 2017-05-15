@@ -21,6 +21,15 @@ public class Calculator {
 	public double calcDeterminant(double[][] matrix, int tasks) {
     	double result = 0;
 
+		// Trivial 1x1 matrix
+		if (matrix.length == 1) {
+			return matrix[0][0];
+		}
+		// Trivial 2x2 matrix
+		else if (matrix.length == 2) {
+			return matrix[0][0] * matrix[1][1] - matrix[1][0] * matrix[0][1];
+		}
+
 		ExecutorService es = Executors.newFixedThreadPool(tasks);
 
 		List<Future<Double>> futures = feedMatrixes(matrix, es);
@@ -33,7 +42,7 @@ public class Calculator {
 			}
 		}
 
-        logging.log("Threads used in current run: "+matrix.length);
+        logging.log("Max threads running at the same time in current run: "+tasks);
 
         es.shutdown();
 
@@ -51,7 +60,9 @@ public class Calculator {
 
 				double[][] subMatrix = generateSubMatrix(j1, j2, matrix);
 
-				futures.add(es.submit(new ParallelDeterminants(j1, j2, subMatrix, logging)));
+				double coeff = matrix[j1][0]*matrix[j2][1];
+
+				futures.add(es.submit(new ParallelDeterminants(j1, j2, coeff, subMatrix, logging)));
 			}
 		}
 
@@ -64,14 +75,16 @@ public class Calculator {
 		int newMatrixJ = 0;
 
 		for (int j=0; j<matrix.length; ++j) {
+			if (j == j1 || j == j2) {
+				continue;
+			}
+
 			for (int i=0; i<newMatrix.length; ++i) {
-				if (j == j1 || j == j2) {
-					continue;
-				}
 	
 				newMatrix[newMatrixJ][i] = matrix[j][i+2];
-				++newMatrixJ;
 			}
+
+			++newMatrixJ;
 		}
 
 		return newMatrix;

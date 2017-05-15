@@ -24,7 +24,6 @@ public class App
     }
 
     public void run(String[] args) throws ParseException {
-    	System.out.println(Runtime.getRuntime().availableProcessors());
     	long start = System.currentTimeMillis();
 
     	Options options = new Options();
